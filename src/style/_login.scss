@@ -1,0 +1,58 @@
+.login-out-bg {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100vh;
+    width: 100vw;
+    background: linear-gradient(45deg, #4534C6, #E2517D);
+
+    .login-out-bg-container {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+    }
+
+    .login-out-bg-graphic {
+        margin-left: -10%;
+        background-size: contain;
+        height: 400px;
+        width: 508px;
+        background-image: url("../assets/graphic.png");
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+
+    .login-out-bg-box {
+        margin-right: 50px;
+        width: 400px;
+        padding: 30px 30px;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.25);
+    }
+
+    .login-out.title {
+        color: $BLACK;
+        margin-bottom: 20px;
+    }
+
+    .login-out.my-input {
+        margin: 10px 0;
+    }
+
+    .instead-text {
+        display: inline-block;
+        cursor: pointer;
+        opacity: 0.75;
+        margin-top: 30px;
+        font-family: $FAMILY;
+        font-weight: $BOLD;
+        font-size: 12px;
+        color: $BLACK;
+        transition-duration: $SPEED;
+
+        &:hover {
+            opacity: 1;
+        }
+    }
+}

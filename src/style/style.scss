@@ -1,0 +1,60 @@
+@import "./_vars.scss";
+@import "./_login.scss";
+@import "./_chat.scss";
+
+* {
+    padding: 0;
+    margin: 0;
+}
+
+.title {
+    font-family: $FAMILY;
+    font-weight: $BOLD;
+    font-size: 32px;
+    text-transform: capitalize;
+}
+
+.my-input {
+    border: 2px solid transparent;
+    outline: 0;
+    box-sizing: border-box;
+    padding: 5px 5px 5px 10px;
+    height: 40px;
+    width: 100%;
+    font-family: $FAMILY;
+    font-weight: $REGULAR;
+    font-size: 14px;
+    border-radius: 5px;
+    background-color: transparentize($color: black, $amount: 0.95);
+    transition-duration: $SPEED;
+
+    &:hover {
+        border: 2px solid transparentize($color: black, $amount: 0.9);
+    }
+    &:active, &:focus {
+        border: 2px solid transparentize($color: black, $amount: 0.7);
+    }
+}
+
+.login-out-button {
+    cursor: pointer;
+    margin-top: 20px;
+    border: 0;
+    outline: 0;
+    box-sizing: border-box;
+    padding: 5px;
+    height: 40px;
+    width: 100%;
+    font-family: $FAMILY;
+    font-weight: $BOLD;
+    font-size: 14px;
+    border-radius: 5px;
+    color: white;
+    background-color: darken($color: $GREEN, $amount: 15);
+    transition-duration: $SPEED;
+
+    &:hover {
+        transform: scale(1.03, 1.03);
+        background-color: $GREEN;
+    }
+}

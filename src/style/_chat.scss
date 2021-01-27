@@ -1,0 +1,273 @@
+.chat-container {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    background-color: #EFEFEF;
+
+    .sidebar {
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+        
+        width: 300px;
+        height: 100vh;
+        overflow-y: scroll;
+        background-color: $BLACK;
+
+        .title.chat {
+            padding: 15px 0 0 20px;
+            color: white;
+        }
+
+        .login-out.my-input {
+            color: white;
+            margin: 15px;
+            width: calc(100% - 30px);
+            background-color: transparentize($color: black, $amount: 0.75);
+
+            &:hover {
+                border: 2px solid transparentize($color: white, $amount: 0.75);
+            }
+            &:active, &:focus {
+                border: 2px solid transparentize($color: white, $amount: 0.5);
+            }
+        }
+
+        .user-chat-container {
+            cursor: pointer;
+            opacity: 0.75;
+            padding: 20px;
+            margin-left: 10px;
+            font-family: $FAMILY;
+            font-weight: $BOLD;
+            font-size: 12px;
+            color: white;
+            border-radius: 5px 0 0 5px;
+            margin-bottom: 4px;
+            text-transform: capitalize;
+            transition-duration: $SPEED;
+
+            &:hover {
+                opacity: 0.9;
+                margin-right: 10px;
+                // width: calc(100% - 40px);
+                border-radius: 5px;
+                background-color: transparentize($color: white, $amount: 0.85);
+            }
+        }
+        .user-chat-container.active {
+            opacity: 1;
+            color: $BLACK;
+            background: linear-gradient(90deg, $CHAT_GLOW_COLOR, #EFEFEF);
+
+            &:hover {
+                border-radius: 5px 0 0 5px;
+                margin-right: 0;
+                opacity: 1;
+                color: $BLACK;
+                background: linear-gradient(90deg, $CHAT_GLOW_COLOR, #EFEFEF);
+            }
+        }
+    }
+
+    .chat-body {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+
+        .chat-head {
+            padding: 0 20px;
+            position: fixed;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 60px;
+            width: calc(100vw - 300px - 40px);
+            background-color: lighten($color: $BLACK, $amount: 5);
+
+            .chat-title {
+                font-family: $FAMILY;
+                font-weight: $REGULAR;
+                font-size: 18px;
+                text-transform: capitalize;
+                color: transparentize($color: white, $amount: 0.25);
+
+                span {
+                    font-weight: $BOLD;
+                    color: $CHAT_GLOW_COLOR;
+                }
+            }
+
+            .logged-user-info {
+                display: flex;
+                align-items: center;
+
+                p {
+                    margin-right: 20px;
+                    padding: 5px 10px;
+                    border-radius: 5px;
+                    background-color: transparentize($color: white, $amount: 0.8);
+                    font-family: $FAMILY;
+                    font-weight: $REGULAR;
+                    font-size: 12px;
+                    text-transform: capitalize;
+                    color: transparentize($color: white, $amount: 0.5);
+                }
+            }
+
+            .logout {
+                cursor: pointer;
+                opacity: 0.75;
+                height: 22px;
+                width: 22px;
+                background-size: contain;
+                background-image: url("../assets/logout.png");
+                transition-duration: $SPEED;
+
+                &:hover {
+                    opacity: 1;
+                }
+            }
+        }
+
+        .chat-input {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 90px;
+            padding: 0 50px;
+
+            .typing-alert {
+                visibility: hidden;
+                margin-bottom: 10px;
+                font-family: $FAMILY;
+                font-weight: $BOLD;
+                font-size: 14px;
+                color: transparentize($color: black, $amount: 0.5);
+            }
+            .typing-alert.show {
+                visibility: visible;
+            }
+            
+            .my-input.chat {
+                margin-bottom: 10px;
+                border-radius: 50px;
+                padding-left: 15px;
+                height: 50px;
+                width: 100%;
+            }
+
+            .chat-input-line {
+                display: flex;
+                width: 100%;
+                flex-direction: row;
+            }
+
+            .chat-form {
+                display: flex;
+                width: 100%;
+            }
+
+            .send-button.hide {
+                opacity: 0;
+                pointer-events: none;
+            }
+            
+            .send-button {
+                opacity: 1;
+                cursor: pointer;
+                position: absolute;
+                margin-top: 5px;
+                right: 55px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                border: none;
+                outline: none;
+                height: 40px;
+                width: 40px;
+                flex-shrink: 0;
+                border-radius: 25px;
+                background-color: $BLACK;
+                transition-duration: $SPEED;
+
+                &:hover {
+                    transform: scale(1.1, 1.1);
+                }
+                
+                .send-image {
+                    margin-right: -3px;
+                    height: 20px;
+                    width: 20px;
+                    background-image: url("../assets/send.png");
+                }
+            }
+        }
+
+        .chat-area {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            margin-top: 60px;
+            padding: 50px;
+            overflow-y: scroll;
+
+            .chat-box-line.incoming {
+                flex-direction: column;
+                align-items: flex-start;
+                justify-content: flex-start;
+                .chat-box {
+                    border-radius: 20px 20px 20px 0;
+                    background-color: $CHAT_INCOMING_COLOR;
+                }
+            }
+            .chat-box-line.outgoing {
+                flex-direction: column;
+                align-items: flex-end;
+                justify-content: flex-end;
+                .chat-box {
+                    border-radius: 20px 20px 0 20px;
+                    background-color: $CHAT_OUTGOING_COLOR;
+                }
+            }
+            .chat-box-line {
+                margin-bottom: 4px;
+                display: flex;
+                
+                .chat-box {
+                    display: flex;
+                    align-items: center;
+                    flex-direction: row;
+                    max-width: 50vw;
+                    padding: 10px 15px;
+                    font-family: $FAMILY;
+                    font-weight: $REGULAR;
+                    font-size: 15px;
+                    color: $BLACK;
+
+                    .tick {
+                        opacity: 0.5;
+                        margin-left: 5px;
+                        height: 14px;
+                        width: 14px;
+                        background-image: url("../assets/single-tick.png");
+                    }
+                    .double-tick {
+                        opacity: 0.5;
+                        margin-left: 5px;
+                        height: 14px;
+                        width: 18px;
+                        background-image: url("../assets/double-tick.png");
+                    }
+                }
+                .chat-time {
+                    margin-top: 5px;
+                    font-family: $FAMILY;
+                    font-weight: $BOLD;
+                    font-size: 10px;
+                    color: transparentize($color: $BLACK, $amount: 0.8);
+                }
+            }
+        }
+    }
+}
