@@ -11,7 +11,7 @@
         
         width: 300px;
         height: 100vh;
-        overflow-y: scroll;
+        overflow-y: auto;
         background-color: $BLACK;
 
         .title.chat {
@@ -229,10 +229,47 @@
                     border-radius: 20px 20px 0 20px;
                     background-color: $CHAT_OUTGOING_COLOR;
                 }
+                
+                .tick {
+                    opacity: 0.5;
+                    margin-left: 5px;
+                    height: 14px;
+                    width: 14px;
+                    background-image: url("../assets/single-tick.png");
+                }
+                .double-tick {
+                    opacity: 0.5;
+                    margin-left: 5px;
+                    height: 14px;
+                    width: 18px;
+                    background-image: url("../assets/double-tick.png");
+                }
             }
+
+
+
+
+            .chat-box-line.no-read {
+                .tick {
+                    display: block;
+                }
+
+                .double-tick {
+                    display: none;
+                }
+            }
+
             .chat-box-line {
                 margin-bottom: 4px;
                 display: flex;
+
+                .tick {
+                    display: none;
+                }
+
+                .double-tick {
+                    display: block;
+                }
                 
                 .chat-box {
                     display: flex;
@@ -244,22 +281,8 @@
                     font-weight: $REGULAR;
                     font-size: 15px;
                     color: $BLACK;
-
-                    .tick {
-                        opacity: 0.5;
-                        margin-left: 5px;
-                        height: 14px;
-                        width: 14px;
-                        background-image: url("../assets/single-tick.png");
-                    }
-                    .double-tick {
-                        opacity: 0.5;
-                        margin-left: 5px;
-                        height: 14px;
-                        width: 18px;
-                        background-image: url("../assets/double-tick.png");
-                    }
                 }
+
                 .chat-time {
                     margin-top: 5px;
                     font-family: $FAMILY;

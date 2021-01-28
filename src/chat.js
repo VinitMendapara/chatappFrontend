@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react"
+import React, { useEffect, useState } from "react"
 import { checkLogin, getStorage, resetStorage } from "./util"
 import { ToastContainer, toast } from 'react-toastify'
 import { useHistory } from 'react-router-dom'
@@ -7,7 +7,6 @@ import constants from "./constants"
 import axios from "axios"
 
 export default function Chat() {
-  const messagesEndRef = useRef(null)
   const history = useHistory()
   const my_user_id = getStorage("user_id")
 
@@ -31,6 +30,16 @@ export default function Chat() {
       setUsername(getStorage("username"))
     } else {
       history.push("/login")
+    }
+
+    document.addEventListener("seeking", () => detectDelayRead())
+    document.addEventListener("scroll", () => detectRead())
+    document.addEventListener("mousemove", () => detectRead())
+
+    return () => {
+      document.removeEventListener("seeking", () => detectDelayRead())
+      document.removeEventListener("scroll", () => detectRead())
+      document.removeEventListener("mousemove", () => detectRead())
     }
 
   }, [])
@@ -83,11 +92,18 @@ export default function Chat() {
           }, 1500);
         })
 
+        // double tick on message read
+        socket.on("message_read", id => {
+          document.getElementById(id).classList.remove("no-read")
+          document.getElementById(id).classList.remove("remaining")
+        })
+
         socket.on("chat_message", message => {
           console.log("incoming message")
           console.log([...chat_data])
           console.log(message)
           setChatData(chat_data => [...chat_data, message])
+          detectDelayRead()
         })
 
         socket.emit("register_me", { username })
@@ -146,15 +162,6 @@ export default function Chat() {
     try {
       const resp = await axios(req_obj)
       if (resp.status == 200) {
-        // for (const user of resp.data.data) {
-        // if (user.username !== username) {
-        // setCurrentChatId(user["_id"])
-        // const chat_with = users.find(user => user._id == current_chat_user)["username"]
-        // console.log("2")
-        // socket.emit("register_room", [username, user.username])
-        // break
-        // }
-        // }
         setUsers(resp.data.data)
       }
     } catch (error) {
@@ -176,15 +183,9 @@ export default function Chat() {
       try {
         const resp = await axios(req_obj)
         if (resp.status == 200) {
-          // ...
-          // for (const message_index in data) {
-          //   if (data[message_index].from_user == getStorage("user_id")) data[message_index]["type"] == "outgoing"
-          //   else data[message_index]["type"] == "incoming"
-          // }
-          console.log("data>")
-          console.log(resp.data.data)
           setChatData([])
           setChatData(resp.data.data)
+          detectDelayRead()
         }
       } catch (error) {
         console.error("error in fetching the chat")
@@ -198,7 +199,6 @@ export default function Chat() {
     resetStorage()
     toast(`Bye ${username}!`, { onClose: () => history.push("/login"), autoClose: 1500 })
   }
-
 
   // data for user display purpose
   let filtered_users = users
@@ -215,8 +215,10 @@ export default function Chat() {
   // send message to server
   const sendMessage = async e => {
     e.preventDefault()
-    socket.emit('send', { chat_text, my_user_id, current_chat_user, room })
-    setChatText("")
+    if (chat_text.trim().length > 0) {
+      socket.emit('send', { chat_text, my_user_id, current_chat_user, room })
+      setChatText("")
+    }
   }
 
   const messageTyping = e => {
@@ -224,17 +226,36 @@ export default function Chat() {
     setChatText(e.target.value)
   }
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  const isInViewport = (el) => {
+    const rect = el.getBoundingClientRect()
+    return (
+      rect.top >= 60 &&
+      rect.left >= 0 &&
+      rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+      rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+    )
   }
 
-  useEffect(() => {
-    scrollToBottom()
-  }, [sorted_data]);
 
+  // mark as read
+  const detectDelayRead = () => {
+    setTimeout(() => {
+      detectRead()
+    }, 3000);
+  }
+
+  const detectRead = () => {
+    const no_read_chat_blocks = document.getElementsByClassName("incoming remaining")
+    // console.log(no_read_chat_blocks)
+    for (const elt of no_read_chat_blocks) {
+      if (elt.className.includes("incoming") && isInViewport(elt)) {
+        socket.emit("mark_read", {id: elt.id, room})
+      }
+    }
+  }
 
   return (
-    <div className="chat-container">
+    <div className="chat-container" onKeyPress={() => detectDelayRead()} onMouseEnter={() => detectDelayRead()}>
 
       <ToastContainer />
 
@@ -254,7 +275,7 @@ export default function Chat() {
         }
 
       </div>
-      <div className="chat-body">
+      <div className="chat-body" >
 
         <div className="chat-head">
           <p className="chat-title">Chat with <span>{chatting_with}</span></p>
@@ -267,15 +288,25 @@ export default function Chat() {
         <div className="chat-area">
 
           {
-            sorted_data.map(chat_block =>
-              <div className={`chat-box-line ${chat_block.from_user == my_user_id ? "outgoing" : "incoming"}`} key={chat_block.message}>
-                <p className="chat-box">{chat_block.message} {chat_block.to_user == current_chat_user ? chat_block.read ? <div className="double-tick" /> : <div className="tick" /> : <></>}</p>
-                {/* <p className="chat-box">{chat_block.message}</p> */}
-                <p className="chat-time">{new Date(chat_block.createdAt).toLocaleString('en-US', { hour12: true })}</p>
-              </div>
+            sorted_data.map(chat_block => {
+              console.log(chat_block)
+              if (chat_block.read_mark) {
+                return <div className={`chat-box-line ${chat_block.from_user == my_user_id ? "outgoing" : "incoming"}`} key={chat_block.createdAt}>
+                  <p className="chat-box">{chat_block.message} <div className="double-tick" /> <div className="tick" /> </p>
+                  {/* <p className="chat-box">{chat_block.message}</p> */}
+                  <p className="chat-time">{new Date(chat_block.createdAt).toLocaleString('en-US', { hour12: true })}</p>
+                </div>
+              } else {
+                return <div id={chat_block._id} className={`chat-box-line ${chat_block.from_user == my_user_id ? "outgoing no-read" : "incoming remaining"}`} key={chat_block.createdAt}>
+                  <p className="chat-box">{chat_block.message} <div className="double-tick" /> <div className="tick" /> </p>
+                  {/* <p className="chat-box">{chat_block.message}</p> */}
+                  <p className="chat-time">{new Date(chat_block.createdAt).toLocaleString('en-US', { hour12: true })}</p>
+                </div>
+              }
+            }
             )
           }
-          <div ref={messagesEndRef} />
+
         </div>
 
         <div className="chat-input">
@@ -294,3 +325,20 @@ export default function Chat() {
     </div>
   )
 }
+
+// function useOnScreen(elt) {
+
+//   const [isIntersecting, setIntersecting] = useState(false)
+
+//   const observer = new IntersectionObserver(
+//     ([entry]) => setIntersecting(entry.isIntersecting)
+//   )
+
+//   useEffect(() => {
+//     observer.observe(elt)
+//     // Remove the observer as soon as the component is unmounted
+//     return () => { observer.disconnect() }
+//   }, [])
+
+//   return isIntersecting
+// }
