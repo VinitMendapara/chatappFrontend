@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, useRef } from "react"
 import { checkLogin, getStorage, resetStorage } from "./util"
 import { ToastContainer, toast } from 'react-toastify'
 import { useHistory } from 'react-router-dom'
@@ -7,6 +7,7 @@ import constants from "./constants"
 import axios from "axios"
 
 export default function Chat() {
+  const messagesEndRef = useRef(null)
   const history = useHistory()
   const my_user_id = getStorage("user_id")
 
@@ -254,6 +255,16 @@ export default function Chat() {
     }
   }
 
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }
+
+  useEffect(() => {
+    scrollToBottom()
+  }, [sorted_data]);
+
+
+
   return (
     <div className="chat-container" onKeyPress={() => detectDelayRead()} onMouseEnter={() => detectDelayRead()}>
 
@@ -306,7 +317,7 @@ export default function Chat() {
             }
             )
           }
-
+          <div ref={messagesEndRef} />
         </div>
 
         <div className="chat-input">
